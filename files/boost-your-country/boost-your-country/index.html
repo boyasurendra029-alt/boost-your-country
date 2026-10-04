@@ -34,6 +34,7 @@ h1{font-size:15px;font-weight:800;text-align:center;height:28px;line-height:30px
 .tc .hd{display:flex;justify-content:space-between;padding:0 7px 3px;font-weight:800;font-size:12px}
 .tc .hd span:first-child{color:#ff5fb0}.tc .hd span:last-child{color:var(--green);font-size:11px}
 #strip{display:flex;gap:7px;overflow-x:hidden;padding:0 6px;height:62px}
+.track{display:flex;gap:7px;flex:0 0 auto;will-change:transform}
 .ch{flex:0 0 140px;display:flex;gap:6px;align-items:center;padding:5px;border-radius:6px;background:#2a2410;border:1px solid #5a4a1a}
 .ch.top{outline:1.5px solid var(--gold)}
 .av{width:42px;height:42px;flex:0 0 42px;border:2px solid #b79cf5;border-radius:3px;display:grid;place-items:center;font-size:22px;color:#fff;position:relative;background-size:cover;background-position:center;box-shadow:0 0 0 1.5px #6b4fa8;margin-top:5px}
@@ -100,6 +101,11 @@ h1{font-size:15px;font-weight:800;text-align:center;height:28px;line-height:30px
   <input id="link" type="text" inputmode="url" placeholder="https://youtube.com/live/…" autocomplete="off" autocapitalize="off" spellcheck="false">
   <label for="lang">Commentary language</label>
   <select id="lang"><option value="en">English</option><option value="te">తెలుగు (Telugu)</option></select>
+  <label for="vstyle">Voice</label>
+  <select id="vstyle"><option value="girl">Girl voice</option><option value="boy">Boy voice</option></select>
+  <label for="vname">Pick a specific voice (optional)</label>
+  <select id="vname"><option value="">Auto - best match</option></select>
+  <button class="btn alt" id="vtest" type="button">▶ Test voice</button>
   <div class="tg"><input id="voice" type="checkbox" checked><label for="voice" style="margin:0;font-size:14px;color:#cfcfe8">Voice commentary on</label></div>
   <div class="tg"><input id="keep" type="checkbox" checked><label for="keep" style="margin:0;font-size:14px;color:#cfcfe8">Keep scores from last time</label></div>
   <button class="btn go" id="start">Start game</button>
@@ -142,17 +148,19 @@ const BASE=[["us","USA",15100],["cl","Chile",11200],["id","Indonesia",11100],["i
 ["om","Oman",849],["jo","Jordan",813],["mc","Monaco",810],["nz","New Zealand",804],["gy","Guyana",801],["mv","Maldives",800],["bh","Bahrain",800],["lv","Latvia",800],["sg","Singapore",673]];
 // countries that start below the board and can climb into it
 const EXTRA=[["jp","Japan",650],["kr","South Korea",640],["lk","Sri Lanka",630],["ae","UAE",620],["ca","Canada",610],["za","South Africa",600],["ke","Kenya",590],["vn","Vietnam",580],["ir","Iran",570],["af","Afghanistan",560],["gr","Greece",550],["nl","Netherlands",540],["be","Belgium",530],["ch","Switzerland",520],["ie","Ireland",510],["fi","Finland",500],["cz","Czechia",490],["hu","Hungary",480],["ro","Romania",470],["rs","Serbia",460],["hr","Croatia",450],["ge","Georgia",440],["am","Armenia",430],["az","Azerbaijan",420],["qa","Qatar",410],["lb","Lebanon",400],["dz","Algeria",390],["tn","Tunisia",380],["gh","Ghana",370],["et","Ethiopia",360],["pe","Peru",350],["ec","Ecuador",340],["py","Paraguay",330],["uy","Uruguay",320],["cr","Costa Rica",310],["jm","Jamaica",300],["mm","Myanmar",295],["kh","Cambodia",290],["mn","Mongolia",285]];
-const ALLC=BASE.concat(EXTRA),BOARD=63;
-const KW={us:["america","united states","u.s.a"],gb:["england","britain","united kingdom"],in:["bharat","hindustan","jai hind","भारत","इंडिया","భారత్","ఇండియా","భారతదేశం"],ae:["dubai","emirates"],kr:["korea"],nl:["holland"],cz:["czech"],tl:["timor"],ps:["gaza"],sa:["saudi"],nz:["newzealand"],mm:["burma"],de:["deutschland"],es:["españa","espana"],br:["brasil"],id:["indonesian"],ph:["pilipinas"],pk:["pakistan zindabad"],lk:["srilanka"],za:["southafrica"]};
+const MORE=[["sy","Syria"],["ye","Yemen"],["ly","Libya"],["sd","Sudan"],["ss","South Sudan"],["tz","Tanzania"],["ug","Uganda"],["zw","Zimbabwe"],["zm","Zambia"],["mz","Mozambique"],["ao","Angola"],["sn","Senegal"],["ci","Ivory Coast"],["cm","Cameroon"],["cd","DR Congo"],["cg","Congo"],["na","Namibia"],["bw","Botswana"],["mg","Madagascar"],["rw","Rwanda"],["ml","Mali"],["bo","Bolivia"],["pa","Panama"],["do","Dominican Republic"],["sv","El Salvador"],["hn","Honduras"],["ni","Nicaragua"],["tt","Trinidad and Tobago"],["bs","Bahamas"],["bb","Barbados"],["is","Iceland"],["lu","Luxembourg"],["mt","Malta"],["cy","Cyprus"],["al","Albania"],["ba","Bosnia"],["mk","North Macedonia"],["me","Montenegro"],["md","Moldova"],["si","Slovenia"],["sk","Slovakia"],["bg","Bulgaria"],["kg","Kyrgyzstan"],["tj","Tajikistan"],["tm","Turkmenistan"],["la","Laos"],["bn","Brunei"],["pg","Papua New Guinea"],["fj","Fiji"],["kp","North Korea"],["tw","Taiwan"],["hk","Hong Kong"],["ad","Andorra"],["li","Liechtenstein"],["sm","San Marino"],["lr","Liberia"],["sl","Sierra Leone"],["gm","Gambia"],["gn","Guinea"],["bf","Burkina Faso"],["tg","Togo"],["bj","Benin"],["mr","Mauritania"],["td","Chad"],["er","Eritrea"],["dj","Djibouti"],["mu","Mauritius"],["sc","Seychelles"],["cv","Cape Verde"],["ga","Gabon"],["ls","Lesotho"],["bi","Burundi"],["km","Comoros"]];
+const ALLC=BASE.concat(EXTRA,MORE),BOARD=63;
+const KW={us:["america","united states","u.s.a"],gb:["england","britain","united kingdom"],in:["bharat","hindustan","jai hind","भारत","इंडिया","భారత్","ఇండియా","భారతదేశం"],ae:["dubai","emirates"],kr:["korea"],nl:["holland"],cz:["czech"],tl:["timor"],ps:["gaza"],sa:["saudi"],nz:["newzealand"],mm:["burma"],de:["deutschland"],es:["españa","espana"],br:["brasil"],id:["indonesian"],ph:["pilipinas"],pk:["pakistan zindabad"],lk:["srilanka"],za:["southafrica"],tt:["trinidad"],ci:["cote d'ivoire","côte d'ivoire"],cd:["drc","democratic republic of congo"],cv:["cabo verde"],ba:["bosnia and herzegovina"],mk:["macedonia"],tr:["türkiye","turkiye"]};
 
 const FL=c=>String.fromCodePoint(...[...c.toUpperCase()].map(x=>127397+x.charCodeAt(0)));
 const img=c=>`https://flagcdn.com/w80/${c}.png`;
 const $=id=>document.getElementById(id);
 const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
 const name={},score={},RX={};
-ALLC.forEach(([c,n,s])=>{name[c]=n;score[c]=s;
-  const keys=[n.toLowerCase(),...(KW[c]||[])].map(esc);
-  RX[c]=new RegExp("(^|[^a-z\\u00c0-\\u024f])("+keys.join("|")+")([^a-z\\u00c0-\\u024f]|$)","i")});
+const DETS=[];
+ALLC.forEach(([c,n])=>{name[c]=n;score[c]=0;
+  [n.toLowerCase(),...(KW[c]||[])].forEach(k=>DETS.push([k.length,c,new RegExp("(^|[^a-z\\u00c0-\\u024f])"+esc(k)+"([^a-z\\u00c0-\\u024f]|$)","i")]))});
+DETS.sort((a,b)=>b[0]-a[0]);
 const START=Object.assign({},score);
 let chat={};
 const COLORS=["#2bb5b0","#ef4f7a","#7b6cf0","#e0902b","#3fae5e","#c04fd1"];
@@ -198,25 +206,43 @@ te:{lang:"te-IN",
  paid:(n,c,p)=>`వావ్! ${n} సూపర్ చాట్ పంపారు! ${c} కి ప్లస్ ${p} పాయింట్లు!`,
  boost:(n,c,a)=>`${n}, ${c} ని ${a} పాయింట్లు పెంచారు!`}
 };
-let lang="en",voiceOn=true,curPrio=0,lastSay=Date.now(),remI=0,lastWelcome=0;
+let lang="en",voiceOn=true,lastSay=Date.now(),remI=0,vstyle="girl",vname="";
+let busy=false,pending=null,busyTimer=null,cur=null;
 const T=()=>TXT[lang];
-function pickVoice(){if(!("speechSynthesis" in window))return null;const w=T().lang.toLowerCase(),vs=speechSynthesis.getVoices();
-  return vs.find(v=>v.lang.toLowerCase().replace("_","-")===w)||vs.find(v=>v.lang.toLowerCase().startsWith(w.slice(0,2)))||null}
+const FEM=/female|woman|girl|zira|samantha|victoria|karen|moira|tessa|fiona|susan|hazel|heera|veena|catherine|allison|serena|jenny|aria|sara|lekha|priya|neerja|swara|shruti|aditi|raveena|sfg|tpf|tpc|iob|iog|gba|gbc/i;
+const MAL=/\bmale\b|\bman\b|david|mark|george|james|daniel|alex|fred|ravi|prabhat|guy|christopher|matthew|rishi|tpd|iol|iom|rjs|gbb|gbd/i;
+const isF=v=>FEM.test(v.name),isM=v=>!isF(v)&&MAL.test(v.name);
+function langVoices(){if(!("speechSynthesis" in window))return[];const w=T().lang.toLowerCase().slice(0,2);
+  return speechSynthesis.getVoices().filter(v=>v.lang.toLowerCase().replace("_","-").startsWith(w))}
+function pickVoice(){
+  const vs=langVoices();if(!vs.length)return{v:null,match:false};
+  if(vname){const x=vs.find(v=>v.name===vname);if(x)return{v:x,match:true}}
+  const want=T().lang.toLowerCase(),ex=vs.filter(v=>v.lang.toLowerCase().replace("_","-")===want),pool=ex.length?ex:vs;
+  const g=pool.find(v=>vstyle==="girl"?isF(v):isM(v));
+  return g?{v:g,match:true}:{v:pool[0],match:false}}
+function utter(text){const u=new SpeechSynthesisUtterance(text);u.lang=T().lang;const p=pickVoice();if(p.v)u.voice=p.v;
+  u.rate=1.03;u.pitch=(p.match||vname)?1.05:(vstyle==="girl"?1.35:0.75);return u}
 function showCap(t){const c=$("cap");c.textContent=t;c.classList.remove("say");void c.offsetWidth;c.classList.add("say")}
+function startItem(it){
+  busy=true;cur=it;lastSay=Date.now();showCap(it.text);
+  const done=()=>{if(it.fin||cur!==it)return;it.fin=true;clearTimeout(busyTimer);busy=false;lastSay=Date.now();next()};
+  if(voiceOn&&("speechSynthesis" in window)){
+    busyTimer=setTimeout(done,2500+it.text.length*95);
+    const u=utter(it.text);u.onend=u.onerror=done;
+    try{speechSynthesis.speak(u)}catch(e){done()}
+  }else busyTimer=setTimeout(done,1800+it.text.length*40);
+}
+function next(){const it=pending;pending=null;if(it&&Date.now()-it.t<12000)startItem(it)}
 function say(text,prio=1){
-  const can=voiceOn&&("speechSynthesis" in window);
-  if(can){
-    const busy=speechSynthesis.speaking||speechSynthesis.pending;
-    if(busy){ if(prio>curPrio)speechSynthesis.cancel(); else if(prio<2)return; }
-    const u=new SpeechSynthesisUtterance(text);u.lang=T().lang;const v=pickVoice();if(v)u.voice=v;u.rate=1.04;u.pitch=1.1;
-    curPrio=prio;u.onend=u.onerror=()=>{curPrio=0};
-    speechSynthesis.speak(u);
-  }
-  lastSay=Date.now();showCap(text);
+  const it={text,prio,t:Date.now()};
+  if(!busy){startItem(it);return}
+  // a sentence that has started is always finished; only the newest important line waits for its turn
+  if(prio===0)return;
+  if(!pending||prio>=pending.prio)pending=it;
 }
 setInterval(()=>{ // keep the stream lively when chat is quiet
   if(!running)return;
-  if(Date.now()-lastSay>16000){const r=T().rem;say(r[remI++%r.length],0)}
+  if(!busy&&!pending&&Date.now()-lastSay>16000){const r=T().rem;say(r[remI++%r.length],0)}
 },3000);
 
 /* ================= board ================= */
@@ -224,29 +250,37 @@ const grid=$("grid"),strip=$("strip"),els={};
 ALLC.forEach(([c])=>{const d=document.createElement("div");d.className="fl";d.innerHTML=`<i class="md"></i><b class="cr">👑</b><div class="w" style="background-image:url(${img(c)})"></div><span></span>`;els[c]=d});
 const fmt=n=>n>=1e4?(n/1e3).toFixed(1).replace(/\.0$/,"")+"k":n>=1000?n.toLocaleString("en-US"):""+n;
 const fmtK=n=>n>=1000?(n/1000).toFixed(n>=1e4?1:2).replace(/\.?0+$/,"")+"K":""+n;
-const order=()=>ALLC.map(x=>x[0]).sort((a,b)=>score[b]-score[a]);
+const IDX={};ALLC.forEach(([c],i)=>IDX[c]=i);
+const order=()=>ALLC.map(x=>x[0]).sort((a,b)=>score[b]-score[a]||IDX[a]-IDX[b]);
 function render(){
   const o=order();
   grid.textContent="";
   o.slice(0,BOARD).forEach((c,i)=>{const e=els[c];e.className="fl"+(i<3?" r"+(i+1):"");e.querySelector(".md").textContent=i+1;e.querySelector("span").textContent=fmt(score[c]);grid.appendChild(e)});
 }
+let off=0,setW=0;
 function renderChat(){
-  const sl=strip.scrollLeft;
   const top=Object.entries(chat).sort((a,b)=>b[1].n-a[1].n).slice(0,5);
-  if(!top.length){strip.innerHTML='<div class="empty">Be the first chatter! Type your country.</div>';return}
-  strip.innerHTML=top.map(([a,d],i)=>{
+  if(!top.length){strip.innerHTML='<div class="empty">Be the first chatter! Type your country.</div>';setW=0;return}
+  const one=top.map(([a,d],i)=>{
     const bg=d.photo?`background-image:url(${d.photo})`:`background:${d.color}`;
     return `<div class="ch${i==0?" top":""}"><div class="av" style="${bg}">${d.photo?"":esc2(a[0]||"?").toUpperCase()}<img class="f" src="${img(d.c)}" alt=""></div><div class="t"><b>${d.n}<span>Chats</span></b><u>+${fmtK(d.pts)} points</u><div class="nm">${esc2(a)}</div></div></div>`}).join("");
-  strip.scrollLeft=sl;
+  setW=top.length*147;
+  const sets=Math.max(2,Math.ceil(340/setW)+1);
+  strip.innerHTML='<div class="track" id="track">'+one.repeat(sets)+'</div>';
 }
 const esc2=s=>s.replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
-let dir=1;
-setInterval(()=>{const m=strip.scrollWidth-strip.clientWidth;if(m<=0)return;strip.scrollLeft+=dir*.5;if(strip.scrollLeft>=m-1)dir=-1;if(strip.scrollLeft<=0)dir=1},16);
+let lastT=0;
+function tick(t){const dt=Math.min(60,t-lastT)||16;lastT=t;
+  const tr=document.getElementById("track");
+  if(tr&&setW>0){off=(off+dt*0.025)%setW;tr.style.transform="translateX("+(-off)+"px)"}
+  requestAnimationFrame(tick)}
+requestAnimationFrame(tick);
 
 /* ================= game logic ================= */
 const LIKE=150,SUB=250,SHARE=200;
 function detect(t){const s=t.toLowerCase();
-  for(const [c] of ALLC){if(s.includes(FL(c))||RX[c].test(s))return c}
+  for(const [c] of ALLC){if(s.includes(FL(c)))return c}
+  for(const d of DETS){if(d[2].test(s))return d[1]}
   return null}
 function pos(el){let x=0,y=0;while(el&&el.id!=="stage"){x+=el.offsetLeft;y+=el.offsetTop;el=el.offsetParent}return{x,y}}
 function tag(c,author){
@@ -294,21 +328,21 @@ function onMsg(author,text,photo,paid){
   const t=T(),nm=name[c];
   if(paidPts)say(t.paid(author,nm,paidPts),3);
   else if(bonus.length){const b=bonus[bonus.length-1];say(t[b[0]](author,nm,bsum),3)}
-  else if(ni===0&&pi!==0)say(t.lead(nm),2);
-  else if(ni<pi&&ni<12)say(t.over(nm,name[before[ni]],ni+1),2);
+  else if(ni===0&&pi!==0&&score[before[0]]>0)say(t.lead(nm),2);
+  else if(ni<pi&&ni<12&&score[before[ni]]>0)say(t.over(nm,name[before[ni]],ni+1),2);
   else {
     const top=Object.entries(chat).sort((a,b)=>b[1].n-a[1].n)[0];
     if(top&&top[0]===author&&topNameBefore!==author&&d.n>=3)say(t.chatter(author,d.n),2);
     else if(c==="in"&&++indiaHits%6===0)say(t.hi(),1);
-    else if(isNew&&Date.now()-lastWelcome>7000){lastWelcome=Date.now();say(t.user(author,nm),1)}
+    else if(isNew)say(t.user(author,nm),1)
     else if(Math.random()<.18)say(t.boost(author,nm,add),0);
   }
   save();
 }
 /* ================= persistence ================= */
-function save(){try{localStorage.setItem("byc_state",JSON.stringify({score,chat}))}catch(e){}}
+function save(){try{localStorage.setItem("byc_state2",JSON.stringify({score,chat}))}catch(e){}}
 setInterval(()=>{if(running)save()},5000);
-function loadState(){try{const s=JSON.parse(localStorage.getItem("byc_state")||"null");if(s){Object.keys(s.score||{}).forEach(c=>{if(c in score)score[c]=s.score[c]});chat=s.chat||{}}}catch(e){}}
+function loadState(){try{const s=JSON.parse(localStorage.getItem("byc_state2")||"null");if(s){Object.keys(s.score||{}).forEach(c=>{if(c in score)score[c]=s.score[c]});chat=s.chat||{}}}catch(e){}}
 
 /* ================= live chat ================= */
 let running=false,S=null,first=true,fails=0,seen=new Set(),demoT=null,mode="";
@@ -344,8 +378,8 @@ async function startLive(){
   finally{$("start").disabled=false;$("start").textContent="Start game"}
 }
 function launch(){
-  lang=$("lang").value;voiceOn=$("voice").checked;$("mute").textContent=voiceOn?"🔊":"🔇";
-  if(!$("keep").checked){ALLC.forEach(([c,n,s])=>score[c]=START[c]);chat={};try{localStorage.removeItem("byc_state")}catch(e){}}
+  lang=$("lang").value;voiceOn=$("voice").checked;vstyle=$("vstyle").value;vname=$("vname").value;$("mute").textContent=voiceOn?"🔊":"🔇";
+  if(!$("keep").checked){ALLC.forEach(([c,n,s])=>score[c]=START[c]);chat={};try{localStorage.removeItem("byc_state2")}catch(e){}}
   else loadState();
   render();renderChat();
   $("setup").style.display="none";running=true;
@@ -358,11 +392,17 @@ const DN=["Aarav_K","senapipranjan","emiliasilva7322","RuslanTv-vt4dl","TatianaV
 const DT=["india","india 🇮🇳","brazil","nepal","italy","japan","usa","🇮🇳 jai hind","mexico","indonesia","chile","pakistan","india liked","india subscribed","brazil shared","sri lanka"];
 function startDemo(){mode="demo";conn("demo mode");launch();
   demoT=setInterval(()=>onMsg(DN[Math.random()*DN.length|0],DT[Math.random()*DT.length|0]),1300)}
+function fillVoices(){const sel=$("vname"),cur0=sel.value;lang=$("lang").value;
+  sel.innerHTML='<option value="">Auto - best match</option>'+langVoices().map(v=>`<option value="${esc2(v.name)}">${esc2(v.name)}${isF(v)?" (female)":isM(v)?" (male)":""}</option>`).join("");
+  if([...sel.options].some(o=>o.value===cur0))sel.value=cur0}
+const TESTTXT={en:"Hello! This is the voice for Boost Your Country.",te:"హలో! ఇది బూస్ట్ యువర్ కంట్రీ వాయిస్."};
+$("vtest").onclick=()=>{if(!("speechSynthesis" in window))return;lang=$("lang").value;vstyle=$("vstyle").value;vname=$("vname").value;
+  speechSynthesis.cancel();speechSynthesis.speak(utter(TESTTXT[lang]))};
 $("start").onclick=startLive;$("demo").onclick=startDemo;
 $("link").addEventListener("keydown",e=>{if(e.key==="Enter")startLive()});
 $("mute").onclick=()=>{voiceOn=!voiceOn;$("mute").textContent=voiceOn?"🔊":"🔇";if(!voiceOn&&"speechSynthesis" in window)speechSynthesis.cancel()};
-if("speechSynthesis" in window){speechSynthesis.onvoiceschanged=()=>{};speechSynthesis.getVoices()}
-$("lang").onchange=()=>{lang=$("lang").value;const tip=$("tip");
+if("speechSynthesis" in window){speechSynthesis.onvoiceschanged=fillVoices;speechSynthesis.getVoices()}
+$("lang").onchange=()=>{lang=$("lang").value;fillVoices();const tip=$("tip");
   if(lang==="te"&&"speechSynthesis" in window&&!speechSynthesis.getVoices().some(v=>v.lang.toLowerCase().startsWith("te")))
     tip.textContent="No Telugu voice found on this phone. Install it in Settings > Google Text-to-speech > Install voice data > Telugu, or captions will show without Telugu speech."};
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&running&&"speechSynthesis" in window)speechSynthesis.resume()});
@@ -371,7 +411,8 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden&&running&&
 function fit(){const s=Math.min(innerWidth/360,innerHeight/640),st=$("stage");
   st.style.transform=`scale(${s})`;st.style.left=(innerWidth-360*s)/2+"px";st.style.top=(innerHeight-640*s)/2+"px"}
 addEventListener("resize",fit);addEventListener("orientationchange",fit);fit();
-render();renderChat();
+render();renderChat();fillVoices();
 </script>
 </body>
 </html>
+
